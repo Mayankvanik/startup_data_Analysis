@@ -4,6 +4,36 @@ import matplotlib.pyplot as plt
 
 df = pd.read_csv('clean_start.csv')
 
+def load_startup_detail(startup):
+    st.title(startup)
+
+    #industry of start up
+    start=df[df['Startup Name']==startup]['subvertical'].values[0]
+
+    # City of start up
+    city = df[df['Startup Name'] == startup]['city'].values[0]
+
+    # funding round of start up
+    round = df[df['Startup Name'] == startup]['Round'].values[0]
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric('Industry',start)
+
+    with col2:
+        st.metric('City',city)
+
+    with col3:
+        st.metric('Funding Stage',round)
+
+    #Subindustry
+    data = pd.DataFrame(df[df['Startup Name'].str.contains(startup)]['subvertical'].values)
+    data.dropna(inplace=True)
+    Data = pd.DataFrame(data[0].unique())
+    Data.rename(columns={0: startup}, inplace=True)
+    st.subheader('Subindustry Domain')
+    st.dataframe(Data)
+
 def load_overall_analysis():
     st.title('overall Analysis')
 
@@ -110,8 +140,10 @@ if option == 'Overall Analysis':
     load_overall_analysis()
 
 elif option == 'StartUp':
-    st.sidebar.selectbox('Select StartUp',sorted(df['Startup Name'].unique().tolist()))
+    company=st.sidebar.selectbox('Select StartUp',sorted(df['Startup Name'].unique().tolist()))
     btn1 = st.sidebar.button('Find StartUp Details')
+    if btn1:
+        load_startup_detail(company)
     st.title('StartUp Analysis')
 else:
     selected=st.sidebar.selectbox('Select StartUp',sorted(set(df.investors.str.split(',').sum())))
